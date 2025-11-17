@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>일기 쓰기</title>
+</head>
+<script>
+    function addFileInput() {
+        const container = document.getElementById('fileInputs');
+        const wrapper = document.createElement('div');
+        wrapper.className = 'file-row';
+
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.name = 'imageFiles';
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'remove-btn';
+        btn.textContent = '취소';
+        btn.onclick = function () {
+            removeFileInput(btn);
+        };
+
+        wrapper.appendChild(input);
+        wrapper.appendChild(btn);
+
+        container.appendChild(wrapper);
+    }
+
+    function removeFileInput(btn) {
+        const wrapper = btn.parentNode;
+        wrapper.remove();
+    }
+</script>
+<body>
+<h1>일기 쓰기</h1>
+
+<form th:action="@{/diary}" th:object="${diary}" method="post" enctype="multipart/form-data">
+	<div>
+	    <label>제목</label><br>
+	    <input type="text" th:field="*{title}">
+	    <div style="color:red; font-size: 12px;"
+	         th:if="${#fields.hasErrors('title')}"
+	         th:errors="*{title}">
+	    </div>
+	</div>
+
+    <div style="margin-top: 8px;">
+        <label>내용</label><br>
+        <textarea th:field="*{content}" rows="10" cols="50"></textarea>
+    </div>
+
+    <div style="margin-top: 8px;">
+        <label>사진 첨부</label><br>
+		<div id="fileInputs">
+		    <div class="file-row">
+		        <input type="file" name="imageFiles">
+		        <button type="button" class="remove-btn" onclick="removeFileInput(this)">취소</button>
+		    </div>
+		</div>
+			<button type="button" onclick="addFileInput()">파일 추가</button>
+    </div>
+
+    <div style="margin-top: 12px;">
+        <button type="submit">저장</button>
+        <a th:href="@{/diary}">목록으로</a>
+    </div>
+</form>
+
+</body>
+</html>

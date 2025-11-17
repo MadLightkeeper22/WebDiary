@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>일기 수정</title>
+
+    <style>
+        .image-row {
+            margin-bottom: 10px;
+        }
+        .file-row {
+            margin-bottom: 5px;
+        }
+        .btn-small {
+            margin-left: 5px;
+        }
+    </style>
+
+    <script>
+        // 새 파일 input 추가
+        function addFileInput() {
+            const container = document.getElementById('fileInputs');
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'file-row';
+
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.name = 'imageFiles';
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn-small';
+            btn.textContent = '취소';
+            btn.onclick = function () {
+                removeFileInput(btn);
+            };
+
+            wrapper.appendChild(input);
+            wrapper.appendChild(btn);
+
+            container.appendChild(wrapper);
+        }
+
+        // 새로 추가한 파일 input 취소
+        function removeFileInput(btn) {
+            const wrapper = btn.parentNode;
+            wrapper.remove();
+        }
+
+        // 이미 저장된 기존 사진 삭제
+        function removeExistingImage(btn) {
+            const path = btn.getAttribute('data-path');
+
+            // 삭제할 이미지 경로를 hidden input으로 추가
+            const deleteContainer = document.getElementById('deleteImagesContainer');
+            const hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = 'deleteImages';
+            hidden.value = path;
+            deleteContainer.appendChild(hidden);
+
+            // 화면에서 이미지 행 제거
+            const row = btn.closest('.image-row');
+            if (row) {
+                row.remove();
+            }
+        }
+    </script>
+</head>
+<body>
+<h1>일기 수정</h1>
+
+<form th:action="@{|/diary/${diary.id}/edit|}"
+      th:object="${diary}"
+      method="post"
+      enctype="multipart/form-data">
+
+    <div>
+        <label>제목</label><br>
+        <input type="text" th:field="*{title}">
+    </div>
+
+    <div style="margin-top: 8px;">
+        <label>내용</label><br>
+        <textarea th:field="*{content}" rows="10" cols="50"></textarea>
+    </div>
+
+    <!-- 기존 사진 목록 + 삭제 버튼 -->
+    <div style="margin-top: 12px;">
+        <h3>기존 사진</h3>
+
+        <div th:if="${diary.imagePaths != null and #lists.size(diary.imagePaths) > 0}">
+            <div th:each="path : ${diary.imagePaths}"
+                 class="image-row">
+
+                <img th:src="${path}" style="max-width: 150px; margin-right: 10px;">
+
+                <button type="button"
+                        class="btn-small"
+                        th:attr="data-path=${path}"
+                        onclick="removeExistingImage(this)">
+                    삭제
+                </button>
+            </div>
+        </div>
+
+        <div th:if="${diary.imagePaths == null or #lists.size(diary.imagePaths) == 0}">
+            <p>등록된 사진이 없습니다.</p>
+        </div>
+    </div>
+
+    <!-- 삭제할 이미지 경로들을 숨겨서 담아둘 컨테이너 -->
+    <div id="deleteImagesContainer"></div>
+
+    <!-- 새 사진 추가 + 취소 버튼 -->
+    <div style="margin-top: 12px;">
+        <label>사진 추가</label><br>
+
+        <div id="fileInputs">
+            <div class="file-row">
+                <input type="file" name="imageFiles">
+                <button type="button"
+                        class="btn-small"
+                        onclick="removeFileInput(this)">취소</button>
+            </div>
+        </div>
+
+        <button type="button" onclick="addFileInput()">파일 추가</button>
+    </div>
+
+    <div style="margin-top: 12px;">
+        <button type="submit">저장</button>
+        <a th:href="@{|/diary/${diary.id}|}">취소</a>
+    </div>
+
+</form>
+
+</body>
+</html>

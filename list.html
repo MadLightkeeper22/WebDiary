@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>나의 다이어리</title>
+</head>
+<body>
+<h1>나의 다이어리</h1>
+
+<form th:action="@{/diary/searchByDate}" method="get" style="margin-bottom: 20px;">
+    <label>날짜로 검색: </label>
+    <input type="date" name="date">
+    <button type="submit">검색</button>
+	<div th:if="${dateError}" 
+	         style="color:red; font-size: 12px; margin-top: 4px;"
+	         th:text="${dateError}">
+	    </div>
+</form>
+
+<a th:href="@{/diary/new}">일기 쓰기</a>
+
+<table border="1" style="margin-top: 16px;">
+    <thead>
+    <tr>
+        <th>번호</th>
+        <th>제목</th>
+        <th>작성일</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="d : ${diaries}">
+        <td th:text="${d.id}"></td>
+        <td>
+            <a th:href="@{|/diary/${d.id}|}" th:text="${d.title}"></a>
+        </td>
+        <td th:text="${#temporals.format(d.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

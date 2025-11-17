@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${searchDate} + '의 일기'">일기 검색</title>
+</head>
+<body>
+
+<h2 th:text="'[' + ${searchDate} + '] 의 일기 목록'"></h2>
+
+<a th:href="@{/diary}">전체 목록으로 돌아가기</a>
+
+<hr>
+
+<div th:if="${#lists.isEmpty(diaries)}">
+    <p>이 날짜에는 작성된 일기가 없습니다.</p>
+</div>
+
+<div th:unless="${#lists.isEmpty(diaries)}">
+    <ul>
+        <li th:each="d : ${diaries}">
+            <a th:href="@{|/diary/${d.id}|}" th:text="${d.title}"></a>
+            <span th:text="' (' + ${#temporals.format(d.createdAt, 'HH:mm')} + ')'"></span>
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>
